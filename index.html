@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 Untuk Liaa</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: #0d1b2a;
+    color: #f0f0f0;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  .bg-stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, white, transparent),
+      radial-gradient(2px 2px at 60% 70%, white, transparent),
+      radial-gradient(1px 1px at 50% 50%, white, transparent),
+      radial-gradient(1px 1px at 80% 10%, white, transparent),
+      radial-gradient(2px 2px at 90% 60%, white, transparent),
+      radial-gradient(1px 1px at 33% 80%, white, transparent);
+    background-size: 200% 200%;
+    opacity: 0.4;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .page {
+    display: none;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  .page.active { display: flex; animation: fadeIn 0.8s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== LOCK ===== */
+  .lock-box {
+    background: #16283c;
+    padding: 30px 25px;
+    border-radius: 20px;
+    border: 1px solid #2a4a6a;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .lock-box h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #a8c8e8;
+  }
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+  .dot {
+    width: 42px; height: 42px;
+    border: 2px solid #a8c8e8;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+  }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+  .key {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #a8c8e8;
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .key:hover, .key:active {
+    background: #2a4a6a;
+    transform: scale(0.95);
+  }
+  .key.zero { grid-column: 2; }
+
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .popup-overlay.show { display: flex; }
+  .popup {
+    background: #16283c;
+    border: 2px solid #a8c8e8;
+    border-radius: 20px;
+    padding: 25px 20px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    animation: popIn 0.3s ease;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .popup h3 { color: #fff; font-size: 1.3rem; margin-bottom: 10px; }
+  .popup p { color: #a8c8e8; font-size: 0.9rem; margin-bottom: 18px; }
+  .popup .cat { font-size: 3rem; margin-bottom: 10px; }
+  .popup button {
+    background: #a8c8e8;
+    color: #0d1b2a;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.2s;
+  }
+  .popup button:hover { background: #fff; }
+
+  .btn-main {
+    background: #a8c8e8;
+    color: #0d1b2a;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 20px;
+    font-family: 'Georgia', serif;
+    box-shadow: 0 5px 20px rgba(168,200,232,0.3);
+  }
+  .btn-main:hover { background: #fff; transform: scale(1.05); }
+
+  .letter-box {
+    background: #f5f0e8;
+    color: #2a2a2a;
+    padding: 30px 25px;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    border: 1px solid #c9b99a;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .letter-box h3 {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+    color: #5a3a1a;
+  }
+  .letter-box .script {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.8rem;
+    color: #5a3a1a;
+    margin-bottom: 15px;
+    display: block;
+  }
+  .letter-box p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #3a3a3a;
+    margin-bottom: 12px;
+  }
+  .letter-box .sign {
+    margin-top: 15px;
+    font-style: italic;
+    color: #5a3a1a;
+    text-align: right;
+  }
+
+  .menu-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .menu-sub {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.5rem;
+    color: #a8c8e8;
+    margin-bottom: 25px;
+  }
+  .menu-grid {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .menu-card {
+    background: #16283c;
+    border: 2px solid #2a4a6a;
+    border-radius: 15px;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .menu-card:hover {
+    transform: translateY(-5px);
+    border-color: #a8c8e8;
+    box-shadow: 0 10px 25px rgba(168,200,232,0.2);
+  }
+  .menu-hint {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #a8c8e8;
+    font-style: italic;
+  }
+
+  .gallery-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  .gallery-script {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 2rem;
+    color: #a8c8e8;
+    margin-bottom: 20px;
+  }
+  .polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .polaroid {
+    background: #fff;
+    padding: 8px 8px 25px;
+    border-radius: 4px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    transform: rotate(-3deg);
+    transition: 0.3s;
+  }
+  .polaroid:nth-child(even) { transform: rotate(3deg); }
+  .polaroid:hover { transform: rotate(0deg) scale(1.05); }
+  .polaroid img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 2px;
+    background: #ddd;
+  }
+  .polaroid p {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 0.85rem;
+    color: #5a3a1a;
+    text-align: center;
+    margin-top: 6px;
+  }
+  .quote {
+    font-size: 0.85rem;
+    color: #a8c8e8;
+    font-style: italic;
+    max-width: 350px;
+    line-height: 1.6;
+    margin-top: 10px;
+  }
+
+  .flower-box {
+    background: #16283c;
+    border: 1px solid #2a4a6a;
+    border-radius: 15px;
+    padding: 25px 20px;
+    max-width: 420px;
+    width: 100%;
+    text-align: left;
+  }
+  .flower-box h3 {
+    font-family: 'Georgia', serif;
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  .flower-box .script {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.8rem;
+    color: #a8c8e8;
+    margin-bottom: 15px;
+    display: block;
+  }
+  .flower-box p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #d0d8e8;
+    margin-bottom: 10px;
+  }
+  .flower-emoji {
+    font-size: 4rem;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .music-box {
+    background: #16283c;
+    border: 1px solid #2a4a6a;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  .music-box h3 {
+    font-family: 'Georgia', serif;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  .music-box .artist {
+    font-size: 0.9rem;
+    color: #a8c8e8;
+    margin-bottom: 15px;
+  }
+  .album-art {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2a4a6a, #0d1b2a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 15px;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+  }
+  .controls button {
+    background: transparent;
+    border: none;
+    color: #a8c8e8;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .controls button:hover { color: #fff; transform: scale(1.1); }
+  .playlist {
+    margin-top: 20px;
+    text-align: left;
+  }
+  .playlist h4 {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.5rem;
+    color: #a8c8e8;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .song {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 5px;
+  }
+  .song:hover { background: #2a4a6a; }
+  .song-icon {
+    width: 36px; height: 36px;
+    background: #2a4a6a;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+  .song-info { flex: 1; text-align: left; }
+  .song-info .title { font-size: 0.9rem; color: #fff; }
+  .song-info .singer { font-size: 0.75rem; color: #a8c8e8; }
+
+  .btn-back {
+    background: transparent;
+    border: 2px solid #a8c8e8;
+    color: #a8c8e8;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 20px;
+    transition: 0.3s;
+  }
+  .btn-back:hover { background: #a8c8e8; color: #0d1b2a; }
+
+  @media (max-width: 400px) {
+    .polaroid-grid { grid-template-columns: 1fr; }
+    .key { width: 52px; height: 52px; font-size: 1.1rem; }
+    .dot { width: 36px; height: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-stars"></div>
+
+<!-- ============ HALAMAN 1: PASSWORD ============ -->
+<div class="page active" id="page-lock">
+  <div class="lock-box">
+    <h2>Enter a password</h2>
+    <div class="dots">
+      <div class="dot" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+    <div class="keypad">
+      <button class="key" onclick="press(1)">1</button>
+      <button class="key" onclick="press(2)">2</button>
+      <button class="key" onclick="press(3)">3</button>
+      <button class="key" onclick="press(4)">4</button>
+      <button class="key" onclick="press(5)">5</button>
+      <button class="key" onclick="press(6)">6</button>
+      <button class="key" onclick="press(7)">7</button>
+      <button class="key" onclick="press(8)">8</button>
+      <button class="key" onclick="press(9)">9</button>
+      <button class="key" onclick="press('*')">*</button>
+      <button class="key zero" onclick="press(0)">0</button>
+      <button class="key" onclick="press('#')">#</button>
+    </div>
+    <p style="margin-top:20px; font-size:0.8rem; color:#a8c8e8; font-style:italic;">
+      Clue: Tanggal & Bulan Ulang Tahun Liaa 💙
+    </p>
+  </div>
+</div>
+
+<!-- ============ POPUP SALAH ============ -->
+<div class="popup-overlay" id="popupWrong">
+  <div class="popup">
+    <div class="cat">🐱</div>
+    <h3>Wrong Password!</h3>
+    <p>Clue: Tanggal & Bulan Ulang Tahun Kamu.</p>
+    <button onclick="closePopup()">Try Again</button>
+  </div>
+</div>
+
+<!-- ============ HALAMAN 2: SUKSES ============ -->
+<div class="page" id="page-success">
+  <div style="font-size:4rem; margin-bottom:15px;">🐱💕</div>
+  <h2 style="font-family:'Georgia',serif; font-size:1.5rem; color:#fff; margin-bottom:10px;">
+    Yay...
+  </h2>
+  <p style="font-size:1.1rem; color:#a8c8e8; margin-bottom:5px;">
+    You found the right key to my heart ><
+  </p>
+  <button class="btn-main" onclick="showPage('page-letter')">
+    Open Surprise 💌
+  </button>
+</div>
+
+<!-- ============ HALAMAN 3: SURAT PANJANG ============ -->
+<div class="page" id="page-letter">
+  <div class="letter-box">
+    <h3>Untuk Liaa,</h3>
+    <span class="script">Pacar Aku yang Paling Cantik</span>
+
+    <p>Hai, Liaa...</p>
+
+    <p>Aku nulis ini bukan karena ada momen spesial, bukan karena ada tanggal merah, bukan karena ada event. Aku nulis ini karena aku pengen kamu tau—setiap hari sama kamu itu momen spesial buat aku. Setiap hari yang aku lewatin bareng kamu, sekecil apapun itu, rasanya kayak sesuatu yang aku pengen simpen rapi di dalam hati.</p>
+
+    <p>Kamu tau nggak? Hal paling random yang bikin aku seneng tuh cuma liat kamu online. Sesimpel itu. Aku nggak butuh kejutan mewah, aku nggak butuh kado mahal, aku nggak butuh liburan romantis. Aku cuma butuh liat nama kamu muncul di layar HP aku. Apalagi kalo tiba-tiba kamu chat duluan—astaga, mood aku langsung naik 100%, hari yang tadinya males jadi berasa ringan, dan aku senyum-senyum sendiri kayak orang gila.</p>
+
+    <p>Makasih ya, Liaa. Makasih udah jadi orang yang paling sabar ngadepin aku. Aku tau aku bukan cowok yang sempurna. Kadang aku nyebelin, kadang aku ngeselin, kadang aku bikin kamu kesel tanpa aku sadar. Tapi kamu tetep stay. Kamu tetep di sini. Kamu tetep milih aku setiap hari, setiap waktu. Itu aja udah bikin aku bersyukur banget punya kamu.</p>
+
+    <p>Aku nggak janji bisa jadi yang paling sempurna. Aku nggak janji bakal selalu bisa bikin kamu bahagia. Tapi aku janji—aku bakal terus belajar. Aku belajar jadi cowok yang lebih baik buat kamu, buat kita, buat masa depan yang lagi kita bangun pelan-pelan ini.</p>
+
+    <p>Kamu itu rumah, Liaa. Tempat aku pulang cerita capeknya hari ini. Tempat aku ketawa nggak jelas sampe sakit perut. Tempat aku jadi diri sendiri tanpa takut di-judge. Tempat aku bisa nyerah tanpa ngerasa gagal. Kamu adalah tempat paling aman yang pernah aku punya.</p>
+
+    <p>Semenjak ada kamu, hari-hari biasa jadi berasa spesial. Nggak perlu mewah, cukup ada kamu aja udah cukup buat aku. Bicara sama kamu selama lima menit udah bisa ngubah mood aku yang jelek jadi baik. Peluk kamu, walaupun cuma lewat chat, udah bisa bikin aku ngerasa tenang.</p>
+
+    <p>Aku tau aku bukan cowok paling romantis sedunia. Kata-kata aku kadang berantakan, kadang susah dipahami. Tapi rasa sayang aku ke kamu itu beneran tulus dari hati. Nggak main-main, nggak setengah-setengah. Kalau kamu ngerasa aku kurang, bilang aja. Kalau kamu ngerasa aku salah, tegur aja. Aku bakal dengerin. Aku bakal berusaha.</p>
+
+    <p>Tetep sama aku ya, Liaa? Kita jalanin pelan-pelan aja, nggak usah buru-buru. Yang penting bareng-bareng. Apapun rintangan nanti, apapun masalahnya, kita hadapin berdua. Aku nggak mau kamu hadapin dunia ini sendiri. Aku mau jadi orang yang ada di samping kamu—bukan di belakang, bukan di depan, tapi di samping. Sejajar. Bareng.</p>
+
+    <p>Jangan capek ya sama aku. Kalo ada apa-apa cerita aja, jangan dipendem sendiri. Aku di sini. Aku selalu ada. Kalo kamu kangen bilang, kalo kamu ngambek juga bilang. Jangan diem-dieman. Jangan nunggu aku sadar—karena kadang aku nggak peka, dan itu salah aku.</p>
+
+    <p>Kamu berharga banget buat aku, Liaa. Jangan pernah ngerasa sendirian ya. Ada aku di sini selalu. Ada aku yang bakal dengerin cerita kamu, yang bakal ketawa bareng kamu, yang bakal nangis bareng kamu kalo kamu sedih. Aku nggak kemana-mana.</p>
+
+    <p>Aku sayang kamu, bukan cuma hari ini, tapi tiap hari. Bukan cuma saat kamu cantik, tapi saat kamu lelah. Bukan cuma saat kamu senyum, tapi saat kamu nangis. Bukan cuma saat kamu ada, tapi juga saat kamu jauh.</p>
+
+    <p>Makasih udah hadir di hidup aku, Liaa. Makasih udah jadi Liaa yang aku kenal. Makasih udah jadi Liaa yang aku sayang.</p>
+
+    <p>Peluk jauh buat kamu. 💙</p>
+
+    <p class="sign">For yourself, Princess Liaa.<br><strong>by Prince Jrii</strong> ❤️</p>
+  </div>
+
+  <div style="display:flex; gap:10px; justify-content:center; margin-top:15px; flex-wrap:wrap;">
+    <button class="btn-back" id="voiceBtn" onclick="toggleVoice()">🔊 Baca Surat</button>
+  </div>
+
+  <button class="btn-main" onclick="showPage('page-menu')">
+    Lanjut →
+  </button>
+</div>
+
+<!-- ============ HALAMAN 4: MENU ============ -->
+<div class="page" id="page-menu">
+  <h2 class="menu-title">There's still more</h2>
+  <span class="menu-sub">Waiting for you.</span>
+  <div class="menu-grid">
+    <div class="menu-card" onclick="showPage('page-gallery')">💙</div>
+    <div class="menu-card" onclick="showPage('page-flower')">💐</div>
+    <div class="menu-card" onclick="showPage('page-music')">🎵</div>
+  </div>
+  <p class="menu-hint">Open them one by one, okay?</p>
+</div>
+
+<!-- ============ HALAMAN 5: GALERI ============ -->
+<div class="page" id="page-gallery">
+  <h2 class="gallery-title">Our</h2>
+  <span class="gallery-script">Memories</span>
+  <div class="polaroid-grid">
+    <div class="polaroid">
+      <img src="https://i.postimg.cc/0jjvznK3/1790154018567.jpg" alt="Foto 1">
+      <p>momen kita 💙</p>
+    </div>
+    <div class="polaroid">
+      <img src="https://i.postimg.cc/DZBFfH0H/9152943490-118517641508250-1789910280674-(1).png" alt="Foto 2">
+      <p>selalu bareng</p>
+    </div>
+    <div class="polaroid">
+      <img src="https://i.postimg.cc/wMMz12sp/20260828-202520.jpg" alt="Foto 3">
+      <p>manis terus</p>
+    </div>
+    <div class="polaroid">
+      <img src="https://i.postimg.cc/DwnTs7Gx/Screenshot-20260930-195443-Photos-2.jpg" alt="Foto 4">
+      <p>love you</p>
+    </div>
+  </div>
+  <p class="quote">"Every photo tells a story, every smile holds a memory, and every moment with you is a treasure."</p>
+  <button class="btn-back" onclick="showPage('page-menu')">← Back</button>
+</div>
+
+<!-- ============ HALAMAN 6: BUNGA ============ -->
+<div class="page" id="page-flower">
+  <div class="flower-box">
+    <h3>Flowers for</h3>
+    <span class="script">my favorite person</span>
+    <div class="flower-emoji">💐🌹💙</div>
+
+    <p>Kamu adalah bunga yang tumbuh di taman paling sunyi di hatiku. Kamu adalah warna yang membuat duniaku nggak lagi hitam putih. Kamu adalah alasan aku percaya bahwa cinta nggak perlu ribet—cukup jujur, cukup sabar, cukup ada.</p>
+
+    <p>Setiap detik bersamamu adalah lirik lagu yang aku hafal di luar kepala. Setiap tawa kamu adalah nada yang bikin aku lupa masalah. Setiap pelukan kamu, walau cuma lewat kata, adalah tempat aku pulang.</p>
+
+    <p>Aku nggak tau apa yang akan terjadi besok, lusa, tahun depan. Tapi satu hal yang aku tau pasti: aku pengen terus bareng kamu. Bareng-bareng belajar, bareng-bareng tumbuh, bareng-bareng jadi versi terbaik dari diri kita masing-masing.</p>
+
+    <p>Kamu cantik bukan cuma di mata, tapi di hati. Kamu manis bukan cuma di senyum, tapi di sikap. Kamu berharga bukan cuma buat aku, tapi buat semua orang yang kenal kamu.</p>
+
+    <p>Jangan pernah ngerasa kurang, Liaa. Kamu udah lebih dari cukup. Kamu udah segalanya.</p>
+
+    <p style="text-align:center; font-family:'Brush Script MT', cursive; font-size:1.5rem; color:#a8c8e8; margin-top:15px;">
+      Love you, pacarrr ku ❤️
+    </p>
+  </div>
+  <button class="btn-back" onclick="showPage('page-menu')">← Back</button>
+</div>
+
+<!-- ============ HALAMAN 7: MUSIC ============ -->
+<div class="page" id="page-music">
+  <div class="music-box">
+    <h3>You!</h3>
+    <p class="artist">Lany</p>
+    <div class="album-art">🎵</div>
+    <div class="controls">
+      <button onclick="prevSong()">⏮</button>
+      <button onclick="togglePlay()" id="playBtn">⏸</button>
+      <button onclick="nextSong()">⏭</button>
+      <button onclick="toggleFav()" id="favBtn">♡</button>
+    </div>
+  </div>
+
+  <div class="music-box playlist">
+    <h4>Playlist For Liaa</h4>
+    <div class="song" onclick="playSong(0)">
+      <div class="song-icon">🎵</div>
+      <div class="song-info">
+        <div class="title">Sorai</div>
+        <div class="singer">For Revenge</div>
+      </div>
+    </div>
+    <div class="song" onclick="playSong(1)">
+      <div class="song-icon">🎵</div>
+      <div class="song-info">
+        <div class="title">Iqro</div>
+        <div class="singer">Favorit</div>
+      </div>
+    </div>
+    <div class="song" onclick="playSong(2)">
+      <div class="song-icon">🎵</div>
+      <div class="song-info">
+        <div class="title">Cincin</div>
+        <div class="singer">Favorit</div>
+      </div>
+    </div>
+    <div class="song" onclick="playSong(3)">
+      <div class="song-icon">🎵</div>
+      <div class="song-info">
+        <div class="title">Jatuh Suka</div>
+        <div class="singer">Favorit</div>
+      </div>
+    </div>
+    <div class="song" onclick="playSong(4)">
+      <div class="song-icon">🎵</div>
+      <div class="song-info">
+        <div class="title">Teh Hijau</div>
+        <div class="singer">Favorit</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-back" onclick="showPage('page-menu')">← Back</button>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="https://c.termai.cc/a177/bTpl.mpeg" type="audio/mpeg">
+</audio>
+
+<script>
+  // ===== PASSWORD =====
+  const PASSWORD = "0505"; // 5 Mei -> 05 05
+  let input = "";
+  let typing = false;
+
+  function press(num) {
+    if (typing) return;
+    if (input.length >= 4) return;
+    input += num;
+    updateDots();
+
+    if (input.length === 4) {
+      typing = true;
+      setTimeout(() => {
+        if (input === PASSWORD) {
+          showPage('page-success');
+        } else {
+          document.getElementById('popupWrong').classList.add('show');
+          input = "";
+          updateDots();
+        }
+        typing = false;
+      }, 400);
+    }
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('d' + i).textContent = input[i] ? "●" : "";
+    }
+  }
+
+  function closePopup() {
+    document.getElementById('popupWrong').classList.remove('show');
+    input = "";
+    updateDots();
+  }
+
+  // ===== NAVIGASI =====
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+
+    // Stop voice kalo pindah halaman
+    if (speaking) {
+      synth.cancel();
+      speaking = false;
+      const vb = document.getElementById('voiceBtn');
+      if (vb) vb.textContent = "🔊 Baca Surat";
+    }
+  }
+
+  // ===== MUSIC =====
+  const audio = document.getElementById('bgMusic');
+  const playBtn = document.getElementById('playBtn');
+  const favBtn = document.getElementById('favBtn');
+
+  const songs = [
+    { title: "Sorai", singer: "For Revenge", src: "https://c.termai.cc/a180/xxECK8.mpeg" },
+    { title: "Iqro", singer: "Favorit", src: "https://c.termai.cc/a144/zgxEH.mpeg" },
+    { title: "Cincin", singer: "Favorit", src: "https://c.termai.cc/a106/EIqxmo.mpeg" },
+    { title: "Jatuh Suka", singer: "Favorit", src: "https://c.termai.cc/a115/K4uE.mpeg" },
+    { title: "Teh Hijau", singer: "Favorit", src: "https://c.termai.cc/a104/z6T.mpeg" }
+  ];
+
+  let currentSong = 0;
+  let isPlaying = true;
+  let isFav = false;
+
+  // ===== PRELOAD SEMUA LAGU =====
+  window.addEventListener('load', () => {
+    songs.forEach((song) => {
+      if (song.src) {
+        const preloadAudio = new Audio();
+        preloadAudio.preload = 'auto';
+        preloadAudio.src = song.src;
+        preloadAudio.load();
+      }
+    });
+  });
+
+  function togglePlay() {
+    if (isPlaying) {
+      audio.pause();
+      playBtn.textContent = "▶";
+    } else {
+      audio.play();
+      playBtn.textContent = "⏸";
+    }
+    isPlaying = !isPlaying;
+  }
+
+  function toggleFav() {
+    isFav = !isFav;
+    favBtn.textContent = isFav ? "♥" : "♡";
+    favBtn.style.color = isFav ? "#ff6b8a" : "#a8c8e8";
+  }
+
+  function playSong(index) {
+    if (index === currentSong && !audio.paused) {
+      togglePlay();
+      return;
+    }
+
+    currentSong = index;
+    updateSongInfo();
+
+    let fadeOut = setInterval(() => {
+      if (audio.volume > 0.1) {
+        audio.volume -= 0.1;
+      } else {
+        clearInterval(fadeOut);
+        audio.pause();
+        audio.src = songs[index].src;
+        audio.load();
+
+        audio.oncanplaythrough = () => {
+          audio.play();
+          let fadeIn = setInterval(() => {
+            if (audio.volume < 0.8) {
+              audio.volume += 0.1;
+            } else {
+              audio.volume = 0.8;
+              clearInterval(fadeIn);
+            }
+          }, 50);
+        };
+
+        isPlaying = true;
+        playBtn.textContent = "⏸";
+      }
+    }, 30);
+  }
+
+  function prevSong() {
+    currentSong = (currentSong - 1 + songs.length) % songs.length;
+    playSong(currentSong);
+  }
+
+  function nextSong() {
+    currentSong = (currentSong + 1) % songs.length;
+    playSong(currentSong);
+  }
+
+  function updateSongInfo() {
+    const box = document.querySelector('.music-box h3');
+    const artist = document.querySelector('.music-box .artist');
+    box.textContent = songs[currentSong].title;
+    artist.textContent = songs[currentSong].singer;
+  }
+
+  // ===== AUTOPLAY SETELAH KLIK PERTAMA =====
+  let musicStarted = false;
+
+  function startMusic() {
+    if (musicStarted) return;
+    audio.volume = 0.8;
+    audio.play().then(() => {
+      musicStarted = true;
+      isPlaying = true;
+      playBtn.textContent = "⏸";
+    }).catch(() => {});
+  }
+
+  document.addEventListener('click', startMusic, { once: true });
+  document.addEventListener('touchstart', startMusic, { once: true });
+  document.addEventListener('keydown', startMusic, { once: true });
+
+  // ===== TEXT TO SPEECH =====
+  let speaking = false;
+  let synth = window.speechSynthesis;
+  let utterance = null;
+
+  function toggleVoice() {
+    const btn = document.getElementById('voiceBtn');
+
+    if (speaking) {
+      synth.cancel();
+      speaking = false;
+      btn.textContent = "🔊 Baca Surat";
+      return;
+    }
+
+    const letterBox = document.querySelector('#page-letter .letter-box');
+    const text = letterBox.innerText
+      .replace(/💙|❤️|🐱|💕|🌹|💐/g, '')
+      .replace(/\n+/g, '. ');
+
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    const voices = synth.getVoices();
+    const idVoice = voices.find(v => v.lang === 'id-ID' || v.lang.includes('id'));
+    if (idVoice) utterance.voice = idVoice;
+
+    utterance.onend = () => {
+      speaking = false;
+      btn.textContent = "🔊 Baca Surat";
+    };
+
+    synth.speak(utterance);
+    speaking = true;
+    btn.textContent = "⏸ Hentikan";
+  }
+
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => {};
+  }
+</script>
+
+</body>
+</html>
